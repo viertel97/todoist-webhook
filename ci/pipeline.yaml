@@ -12,5 +12,5 @@ variables:
 extends:
   template: pipeline-template.yaml
   parameters:
-      repository: "todoist-refresher-api"
+      repository: "todoist-webhook"
       multi_arch: "false"
