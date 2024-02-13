@@ -1,0 +1,54 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+parameters:
+  - name: repository # name of the parameter; required
+    type: string # data type of the parameter; required
+  - name: multi_arch
+    type: string
+    default: false
+    values:
+      - true
+      - false
+
+
+
+stages:
+  - stage: Docker
+    displayName: Build and Push Docker Image
+    jobs:
+      - job: Build_Push
+        displayName: Build and Push Dockerimage
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - task: Docker@2
+            inputs:
+              containerRegistry: 'GHCR'
+              command: 'login'
+            displayName: 'Login to GHCR'
+
+
+          - ${{ if eq(parameters.multi_arch, 'false') }}:
+              - task: Bash@3
+                inputs:
+                  targetType: 'inline'
+                  script: |
+                    docker buildx create --use
+                    docker buildx inspect --bootstrap
+                    docker buildx build --build-arg PAT=${PAT} --push --platform linux/arm64 -t ghcr.io/viertel97/${{parameters.repository}}:latest -f Dockerfile .
+                    docker buildx stop
+                displayName: 'Build and Push Docker Image'
+
+          - ${{ else }}:
+              - task: Bash@3
+                inputs:
+                  targetType: 'inline'
+                  script: |
+                    docker buildx create --use
+                    docker buildx inspect --bootstrap
+                    docker buildx build --build-arg PAT=${PAT} --push --platform linux/arm64,linux/amd64 -t ghcr.io/viertel97/${{parameters.repository}}:latest -f Dockerfile .
+                    docker buildx stop
+                displayName: 'Build and Push Multi-Platform Docker Image'
