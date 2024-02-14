@@ -2,9 +2,6 @@
 
 set -e
 
-# activate our virtual environment here
-#. /opt/pysetup/.venv/bin/activate
-
 WORKERS=${WORKERS:-1}
 LOG_LEVEL=${LOG_LEVEL:-INFO}
 
@@ -15,9 +12,9 @@ usage() {
 }
 
 if [[ "$1" == "celery" ]]; then
-  python worker/main.py
+  python main_worker.py
 elif [[ "$1" == "fastapi" ]]; then
-  python api/main.py
+  python main_api.py
 else
   echo "Unknown or missing sub-command: '$1'"
   usage

@@ -1,0 +1,7 @@
+ci
+cd
+venv
+notebooks
+logs
+.ruff_cache
+README.md

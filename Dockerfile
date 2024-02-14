@@ -1,20 +1,14 @@
-FROM python:alpine as build
+FROM python:3.11-slim-buster
 ARG PAT
-RUN apk upgrade --no-cache
-WORKDIR /source
-COPY requirements.txt /source/
-COPY docker-entrypoint.sh /source/
 
-RUN python3 -m venv /source/venv
-RUN . /source/venv/bin/activate && python3 -m ensurepip --upgrade && python3 -m pip install -r /source/requirements.txt
+COPY . .
 
-# Build the final image
-FROM python:alpine as final
+COPY requirements.txt .
+
+RUN pip install -r requirements.txt
+
 ENV IS_CONTAINER=True
-RUN apk upgrade --no-cache
-WORKDIR /source
-COPY --from=build /source /source
+
+EXPOSE 9400
 ENTRYPOINT /docker-entrypoint.sh $0 $@
-CMD . /source/venv/bin/activate && fastapi
-
-
+CMD [ "fastapi" ]
