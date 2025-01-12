@@ -1,16 +1,12 @@
 import re
 
 from langchain_core.messages import AIMessage
-from quarter_lib.logging import setup_logging
-
-from shared.services.todoist_service import add_comment_to_thread
-
-
-import numpy as np
-from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_groq import ChatGroq
 from quarter_lib.akeyless import get_secrets
+from quarter_lib.logging import setup_logging
+
+from shared.services.todoist_service import add_comment_to_thread
 
 logger = setup_logging(__name__)
 

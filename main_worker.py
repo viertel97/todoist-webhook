@@ -12,33 +12,28 @@ from worker.services.llm_service import add_llm_answer
 logger = setup_logging(__name__)
 
 app = Celery(
-    __name__,
-    broker=REDIS_URL,
-    backend=REDIS_URL,
+	__name__,
+	broker=REDIS_URL,
+	backend=REDIS_URL,
 )
 app.conf.task_routes = {"app.worker.celery_worker.queue": "items"}
 app.conf.update(task_track_started=True)
 
 
-
 @app.task(name="app.worker.celery_worker.queue")
 def process_webhook(webhook_json: dict) -> str:
-    logger.info(f"Processing webhook: {webhook_json}")
-    webhook = Webhook.model_validate(webhook_json)
+	logger.info(f"Processing webhook: {webhook_json}")
+	webhook = Webhook.model_validate(webhook_json)
 
-    logger.info(
-        f"Task started at {datetime.now()} - Task ID: {current_task.request.id}"
-    )
-    result = insert_webhook_into_database(webhook)
+	logger.info(f"Task started at {datetime.now()} - Task ID: {current_task.request.id}")
+	result = insert_webhook_into_database(webhook)
 
-    if webhook.event_name == "note:added" and webhook.event_data["content"].startswith("@LLM:"):
-        add_llm_answer(webhook)
+	if webhook.event_name == "note:added" and webhook.event_data["content"].startswith("@LLM:"):
+		add_llm_answer(webhook)
 
-    return f"Task completed at {datetime.now()} with result: {result}"
+	return f"Task completed at {datetime.now()} with result: {result}"
 
 
 if __name__ == "__main__":
-    worker = app.Worker(
-        app=app, concurrency=1, loglevel="INFO", hostname="worker1", queues=["items"]
-    )
-    worker.start()
+	worker = app.Worker(app=app, concurrency=1, loglevel="INFO", hostname="worker1", queues=["items"])
+	worker.start()

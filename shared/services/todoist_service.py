@@ -10,6 +10,6 @@ TODOIST_API = TodoistAPI(TODOIST_TOKEN)
 
 
 def add_comment_to_thread(task_id: str, comment: str):
-    logger.info(f"Adding comment to task {task_id}: {comment}")
-    result = TODOIST_API.add_comment(task_id=task_id, content=comment)
-    return result
+	logger.info(f"Adding comment to task {task_id}: {comment}")
+	result = TODOIST_API.add_comment(task_id=task_id, content=comment)
+	return result
