@@ -13,3 +13,5 @@ quarter_lib==0.0.25
 
 langchain-groq==0.2.2
 todoist-api-python==2.1.7
+
+ruff==0.7.1

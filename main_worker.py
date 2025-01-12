@@ -31,7 +31,8 @@ def process_webhook(webhook_json: dict) -> str:
     )
     result = insert_webhook_into_database(webhook)
 
-    # add_llm_answer(webhook)
+    if webhook.event_name == "note:added" and webhook.event_data["content"].startswith("@LLM:"):
+        add_llm_answer(webhook)
 
     return f"Task completed at {datetime.now()} with result: {result}"
 
