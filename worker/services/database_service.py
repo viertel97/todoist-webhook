@@ -12,7 +12,7 @@ ENGINE = create_sqlalchemy_engine()
 
 
 def insert_webhook_into_database(webhook: Webhook):
-    df = pd.json_normalize([webhook.dict()], sep="~")
+    df = pd.json_normalize([webhook.model_dump()], sep="~")
     for column in ["event_data~labels", "event_data~item~labels"]:
         if column in df.columns:
             df[column] = df[column].apply(

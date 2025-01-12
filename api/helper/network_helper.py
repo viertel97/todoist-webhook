@@ -1,7 +1,11 @@
 from json import JSONDecodeError, loads
+from platform import platform
 
 from fastapi import Request
 from loguru import logger
+
+
+DEBUG = platform == "darwin" or platform == "win32" or platform == "Windows"
 
 
 async def log_request_info(request: Request):
@@ -32,3 +36,9 @@ async def log_request_info(request: Request):
         logger.debug("Wrong Empty body")
     except UnicodeDecodeError:
         logger.debug("Wrong Empty body")
+
+def get_url(service):
+    if DEBUG:
+        return "http://192.168.178.49:9300"
+    else:
+        return f"http://{service}.custom.svc.cluster.local:80"

@@ -11,14 +11,14 @@ from fastapi.responses import JSONResponse
 from quarter_lib.logging import setup_logging
 
 from api.config.api_documentation import description, tags_metadata, title
-from api.helper.network_helper import log_request_info
+from api.helper.network_helper import log_request_info, DEBUG
+from api.proxy.telegram_proxy import log_to_telegram
 from api.router.main_router import router as main_controller_router
 from shared.config.constants import REDIS_URL
 
 routers = [main_controller_router]
 logger = setup_logging(__name__)
 
-DEBUG = platform == "darwin" or platform == "win32" or platform == "Windows"
 IS_CONTAINER = os.environ.get("IS_CONTAINER", "False") == "True"
 logger.info(
     "Variables:\nDEBUG: {}\nIS_CONTAINER: {}\nplatform: {}".format(
@@ -65,7 +65,7 @@ async def custom_exception_handler(request: Request, exc: Exception):
     )
     exception_logging_string = f"{exc.__class__.__name__}: {exc}\n\n{''.join(traceback.TracebackException.from_exception(exc).format())}"
     logging_string = f"Exception:\n{exception_logging_string}\n---------\nRequest:\n{request_logging_string}\n\n"
-    # await send_to_telegram(logging_string)
+    # await log_to_telegram(logging_string, logger)
     logger.error(logging_string)
     return JSONResponse(
         content={
