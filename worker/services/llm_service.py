@@ -17,7 +17,7 @@ chat = ChatGroq(temperature=0.5, model_name="llama-3.3-70b-versatile", groq_api_
 
 prompt = PromptTemplate(
 	template="""
-You are a digital assistant. Answer in the language provided.\n{message}\n""",
+You are a digital assistant. Answer in the language provided and keep the answers short.\n{message}\n""",
 	input_variables=["message"],
 )
 
