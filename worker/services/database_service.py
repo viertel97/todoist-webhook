@@ -11,8 +11,7 @@ logger = setup_logging(__name__)
 
 def insert_webhook_into_database(webhook: Webhook) -> None:
 	json_data = json.dumps(webhook.model_dump(), indent=4)
-	connection = create_server_connection()
-	with connection.cursor() as cursor:
+	with create_server_connection() as connection, connection.cursor() as cursor:
 		try:
 			cursor.execute(
 				"INSERT INTO todoist_webhooks_v2 (data) VALUES (%s)",
@@ -23,4 +22,7 @@ def insert_webhook_into_database(webhook: Webhook) -> None:
 			logger.error(f"IntegrityError: {e}")
 			connection.rollback()
 			raise e
-	close_server_connection(connection)
+		except Exception as e:
+			logger.error(f"Error: {e}")
+			connection.rollback()
+			raise e
