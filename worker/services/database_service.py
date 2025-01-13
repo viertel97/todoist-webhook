@@ -1,28 +1,26 @@
-import math
+import json
 
-import pandas as pd
+import pymysql
 from quarter_lib.logging import setup_logging
 
 from shared.models.webhook import Webhook
-from worker.helper.database_helper import create_sqlalchemy_engine
+from worker.helper.database_helper import create_server_connection
 
 logger = setup_logging(__name__)
 
-ENGINE = create_sqlalchemy_engine()
 
-
-def insert_webhook_into_database(webhook: Webhook):
-	df = pd.json_normalize([webhook.model_dump()], sep="~")
-	for column in ["event_data~labels", "event_data~item~labels"]:
-		if column in df.columns:
-			df[column] = df[column].apply(lambda x: str(x) if isinstance(x, list) and len(x) > 0 else math.nan)
-	with ENGINE.connect() as connection:
+def insert_webhook_into_database(webhook: Webhook) -> None:
+	json_data = json.dumps(webhook.model_dump(), indent=4)
+	connection = create_server_connection()
+	with connection.cursor() as cursor:
 		try:
-			result = df.to_sql("todoist_webhooks", con=connection, if_exists="append", index=False, chunksize=50)
+			cursor.execute(
+				"INSERT INTO todoist_webhooks_v2 (data) VALUES (%s)",
+				(json_data,)
+			)
 			connection.commit()
-			logger.info(f"Inserted {result} webhook(s) into database")
-		except Exception as e:
+		except pymysql.err.IntegrityError as e:
+			logger.error(f"IntegrityError: {e}")
 			connection.rollback()
-			logger.error(f"Failed to insert webhook into database: {e}")
 			raise e
-	return result
+	close_server_connection(connection)

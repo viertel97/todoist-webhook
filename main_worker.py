@@ -1,4 +1,3 @@
-import re
 from datetime import datetime
 
 from celery import Celery, current_task
@@ -26,12 +25,12 @@ def process_webhook(webhook_json: dict) -> str:
 	webhook = Webhook.model_validate(webhook_json)
 
 	logger.info(f"Task started at {datetime.now()} - Task ID: {current_task.request.id}")
-	result = insert_webhook_into_database(webhook)
+	insert_webhook_into_database(webhook)
 
 	if webhook.event_name == "note:added" and webhook.event_data["content"].startswith("@LLM:"):
 		add_llm_answer(webhook)
 
-	return f"Task completed at {datetime.now()} with result: {result}"
+	return f"Task completed at {datetime.now()} - Task ID: {current_task.request.id}"
 
 
 if __name__ == "__main__":
