@@ -13,3 +13,8 @@ def add_comment_to_thread(task_id: str, comment: str):
 	logger.info(f"Adding comment to task {task_id}: {comment}")
 	result = TODOIST_API.add_comment(task_id=task_id, content=comment)
 	return result
+
+def add_label_to_task(task_id: str, label: str):
+	logger.info(f"Adding label '{label}' to task {task_id}")
+	result = TODOIST_API.update_task(task_id=task_id, labels=[label])
+	return result

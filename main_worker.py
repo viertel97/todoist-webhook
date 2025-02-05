@@ -6,7 +6,7 @@ from quarter_lib.logging import setup_logging
 from shared.config.constants import REDIS_URL
 from shared.models.webhook import Webhook
 from worker.services.database_service import insert_webhook_into_database
-from worker.services.llm_service import add_llm_answer
+from worker.services.llm_service import add_llm_answer, categorize_task
 
 logger = setup_logging(__name__)
 
@@ -29,6 +29,8 @@ def process_webhook(webhook_json: dict) -> str:
 
 	if webhook.event_name == "note:added" and webhook.event_data["content"].startswith("@LLM:"):
 		add_llm_answer(webhook)
+	if webhook.event_name == "item:added":
+		categorize_task(webhook)
 
 	return f"Task completed at {datetime.now()} - Task ID: {current_task.request.id}"
 
