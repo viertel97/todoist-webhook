@@ -29,7 +29,7 @@ def process_webhook(webhook_json: dict) -> str:
 
 	if webhook.event_name == "note:added" and webhook.event_data["content"].startswith("@LLM:"):
 		add_llm_answer(webhook)
-	if webhook.event_name == "item:added":
+	if webhook.event_name == "item:added" and webhook.event_data["project_id"] == "2242008419" and webhook.event_data["labels"] == []:
 		categorize_task(webhook)
 
 	return f"Task completed at {datetime.now()} - Task ID: {current_task.request.id}"

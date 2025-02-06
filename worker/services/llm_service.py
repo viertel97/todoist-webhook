@@ -45,3 +45,5 @@ def categorize_task(webhook):
 	result_content = result.content.strip()
 	if result_content != "None":
 		add_label_to_task(webhook.event_data["id"], result_content)
+	else:
+		logger.info(f"Content '{message}' could not be categorized.")
