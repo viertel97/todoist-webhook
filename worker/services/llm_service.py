@@ -42,7 +42,7 @@ def categorize_task(webhook):
 	message = webhook.event_data["content"]
 	chain = prompt_categorize_task | chat
 	result: AIMessage = chain.invoke({"message": message})
-	result_content = result.content.strip()
+	result_content = result.content.replace(".","").strip()
 	if result_content != "None":
 		add_label_to_task(webhook.event_data["id"], result_content)
 	else:
