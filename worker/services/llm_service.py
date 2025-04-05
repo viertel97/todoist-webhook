@@ -23,7 +23,8 @@ You are a digital assistant. Answer in the language provided and keep the answer
 
 prompt_categorize_task = PromptTemplate(
 	template="""
-You are a digital assistant. Categorize the task in the categories "Digital" and "Analogue". If the task is digital, answer "Digital". If the task is analogue, answer "Analogue".
+You are a digital assistant. Categorize the task in the categories "Digital" and "Analogue". In general most of the tasks are digital, like preparing, writing, etc.
+If the task is digital, answer "Digital". If the task is analogue, answer "Analogue".
 If the task is neither, answer "None".\n{message}\n""",
 	input_variables=["message"],
 )
