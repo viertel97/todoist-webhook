@@ -18,3 +18,8 @@ def add_label_to_task(task_id: str, label: str):
 	logger.info(f"Adding label '{label}' to task {task_id}")
 	result = TODOIST_API.update_task(task_id=task_id, labels=[label])
 	return result
+
+def get_comments_by_task_id(task_id: str):
+	logger.info(f"Getting conversation for task {task_id}")
+	result = TODOIST_API.get_comments(task_id=task_id)
+	return result

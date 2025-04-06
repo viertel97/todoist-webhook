@@ -5,6 +5,7 @@ from quarter_lib.logging import setup_logging
 
 from shared.config.constants import REDIS_URL
 from shared.models.webhook import Webhook
+from shared.services.todoist_service import get_comments_by_task_id
 from worker.services.database_service import insert_webhook_into_database
 from worker.services.llm_service import add_llm_answer, categorize_task
 
@@ -28,7 +29,8 @@ def process_webhook(webhook_json: dict) -> str:
 	insert_webhook_into_database(webhook)
 
 	if webhook.event_name == "note:added" and webhook.event_data["content"].startswith("@LLM:"):
-		add_llm_answer(webhook)
+		all_comments = get_comments_by_task_id(webhook.event_data["item"]["id"])
+		add_llm_answer(webhook, all_comments)
 	if webhook.event_name == "item:added" and webhook.event_data["project_id"] == "2242008419" and webhook.event_data["labels"] == []:
 		categorize_task(webhook)
 
