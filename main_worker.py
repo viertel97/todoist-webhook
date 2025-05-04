@@ -31,7 +31,7 @@ def process_webhook(webhook_json: dict) -> str:
 	if webhook.event_name == "note:added" and webhook.event_data["content"].startswith("@LLM:"):
 		all_comments = get_comments_by_task_id(webhook.event_data["item"]["id"])
 		add_llm_answer(webhook, all_comments)
-	if webhook.event_name == "item:added" and webhook.event_data["project_id"] == "2242008419" and webhook.event_data["labels"] == []:
+	if webhook.event_name == "item:added" and webhook.event_data["project_id"] == '6Crcr3mXrQ6VWpPv' and webhook.event_data["labels"] == []:
 		categorize_task(webhook)
 
 	return f"Task completed at {datetime.now()} - Task ID: {current_task.request.id}"

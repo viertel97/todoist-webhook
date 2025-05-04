@@ -18,7 +18,7 @@ def add_label_to_task(task_id: str, label: str):
 	logger.info(f"Adding label '{label}' to task {task_id}")
 	task = TODOIST_API.get_task(task_id=task_id)
 	labels = task.labels
-	labels.append(label)
+	labels.extend(label)
 	result = TODOIST_API.update_task(task_id=task_id, labels=list(set(labels)))
 	return result
 

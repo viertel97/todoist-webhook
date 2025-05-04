@@ -1,3 +1,4 @@
+import json
 import re
 
 from langchain_core.messages import AIMessage, HumanMessage
@@ -39,13 +40,30 @@ def get_llm_answer_system_message(webhook: Webhook):
 	)
 
 
+category_dict = {
+    "primary": ["Digital", "Analogue", "None"],  # exactly one should be selected
+    "optional": ["Preparation", "Communication"]
+}
+
 prompt_categorize_task = PromptTemplate(
-	template="""
-You are a digital assistant. Categorize the task in the categories "Digital" and "Analogue". In general most of the tasks are digital, like preparing, writing, etc.
-If the task is digital, answer "Digital". If the task is analogue, answer "Analogue".
-If the task is neither, answer "None".\n{message}\n""",
-	input_variables=["message"],
-)
+    template=f"""
+You are a digital assistant. Your job is to pick:
+
+- **Exactly one** primary category from: {category_dict['primary']}  
+- **Zero or more** optional tags from: {category_dict['optional']}
+
+In general most of the tasks are digital, like preparing, writing, etc.
+Then output **only** a JSON array of the chosen tags.  
+—for example, if the task is digital and involves preparation, you’d output:
+
+["Digital","Preparation"]
+
+If none apply, output an empty array:
+[]
+
+Task:
+{{message}}
+""", input_variables=["message"])
 
 LLM_REGEX = r"@LLM:\s*(.+)"
 
@@ -74,10 +92,16 @@ def add_llm_answer(webhook: Webhook, all_comments: list[Comment]):
 def categorize_task(webhook):
 	message = webhook.event_data["content"]
 	chain = prompt_categorize_task | chat
-	result = chain.invoke({"message": message})
-	result_content = result.content.replace(".","").strip()
+	result_content = chain.invoke({"message": message})
+	try:
+		result_content = json.loads(result_content)
+	except json.JSONDecodeError:
+		logger.error(f"Failed to parse JSON: {result_content}")
+		result_content = ["None"]
 
-	if result_content != "None":
+	if result_content != ["None"]:
+		if "None" in result_content:
+			result_content.remove("None")
 		add_label_to_task(webhook.event_data["id"], result_content)
 	else:
 		logger.info(f"Content '{message}' could not be categorized.")
