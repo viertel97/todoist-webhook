@@ -92,11 +92,12 @@ def add_llm_answer(webhook: Webhook, all_comments: list[Comment]):
 def categorize_task(webhook):
 	message = webhook.event_data["content"]
 	chain = prompt_categorize_task | chat
-	result_content = chain.invoke({"message": message})
+	result: AIMessage = chain.invoke({"message": message}) # AIMessage
 	try:
+		result_content = result.content
 		result_content = json.loads(result_content)
 	except json.JSONDecodeError:
-		logger.error(f"Failed to parse JSON: {result_content}")
+		logger.error(f"Failed to parse JSON: {result}")
 		result_content = ["None"]
 
 	if result_content != ["None"]:
